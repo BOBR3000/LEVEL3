@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Panel</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <style>
+        .center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .notification {
+            margin: 10px;
+            cursor: pointer;
+        }
+        .success {
+            background-color: #5cb85c;
+            color: #fff;
+        }
+        .error {
+            background-color: #d9534f;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="center">
+        <div class="ui message">
+            <div class="header">
+                Центр уведомлений
+            </div>
+        </div>
+        <!-- Компонент панели уведомлений -->
+        <notification-panel :notifications="notifications" @dismiss="dismissNotification"></notification-panel>
+    </div>
+
+    <script>
+        // Определение компонента панели уведомлений
+        Vue.component('notification-panel', {
+
+            props: ['notifications'],
+
+            template: `
+            <div>
+                <div v-for="(notification, index) in notifications" :key="index" class="ui message notification" :class="notification.type" @click="dismiss(index)">
+                    <div class="content">
+                        {{ notification.message }}
+                    </div>
+                </div>
+            </div>
+            `,
+            methods: {
+                // Метод для закрытия уведомления
+                dismiss(index) {
+                    this.$emit('dismiss', index);
+                }
+            }
+        });
+
+        // Создание экземпляра Vue приложения
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    // Массив уведомлений
+                    notifications: [
+                        { message: 'Обновление успешно завершено', type: 'success' },
+                        { message: 'Ошибка в построение компонента', type: 'error' }
+                    ]
+                };
+            },
+            methods: {
+                // Метод для закрытия уведомления 
+                dismissNotification(index) {
+                    this.notifications.splice(index, 1);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

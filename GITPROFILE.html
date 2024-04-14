@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Profile</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .profile-img {
+            max-width: 200px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container">
+        <app></app>
+    </div>
+
+    <!-- JavaScript код -->
+    <script>   
+        // Главный компонент приложения
+        Vue.component('app', {
+ 
+            template: `
+            <div>
+                <h1>GitHub Profile</h1>
+                <!-- Компонент формы ввода имени пользователя -->
+                <user-profile-form @submit="getUserProfile"></user-profile-form>
+                <!-- Компонент профиля пользователя -->
+                <user-profile v-if="profile" :profile="profile"></user-profile>
+                <p v-else>Введите имя пользователя GitHub и нажмите кнопку "Получить профиль".</p>
+            </div>
+            `,
+            data() {
+                return {
+                    profile: null
+                }
+            },
+            // Методы компонента
+            methods: {
+                // Метод для получения профиля пользователя
+                getUserProfile(username) {
+                    fetch(`https://api.github.com/users/${username}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        this.profile = data;
+                    })
+                    .catch(error => {
+                        console.error('Ошибка получения профиля:', error);
+                    });
+                }
+            }
+        });
+
+        // Компонент формы ввода имени пользователя
+        Vue.component('user-profile-form', {
+            template: `
+            <div>
+                <input type="text" v-model="username" placeholder="Введите имя пользователя GitHub">
+                <button @click="submitForm">Получить профиль</button>
+            </div>
+            `,
+            // Данные компонента
+            data() {
+                return {
+                    username: ''
+                }
+            },
+            // Методы компонента
+            methods: {
+                // Метод для отправки формы
+                submitForm() {
+                    this.$emit('submit', this.username);
+                }
+            }
+        });
+
+        // Компонент профиля пользователя
+        Vue.component('user-profile', {
+            // Свойства компонента
+            props: ['profile'],
+            // Шаблон компонента
+            template: `
+            <div>
+                <img :src="profile.avatar_url" alt="Profile Image" class="profile-img">
+                <p><strong>Подписчики:</strong> {{ profile.followers }}</p>
+                <p><strong>Подписки:</strong> {{ profile.following }}</p>
+                <p><strong>Репозитории:</strong> {{ profile.public_repos }}</p>
+            </div>
+            `
+        });
+
+        new Vue({
+            el: '#app'
+        });
+    </script>
+</body>
+</html>
